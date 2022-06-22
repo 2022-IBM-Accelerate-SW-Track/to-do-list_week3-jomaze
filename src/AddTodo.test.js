@@ -17,27 +17,99 @@ afterEach(() => {
 });
 
 
-
+// test('test that App component renders Task', () => {
+//   render(<App />);
+//   const inputTask = screen.getByRole('textbox', {name: /Add New Item/i});
+//   const inputDate = screen.getByPlaceholderText("mm/dd/yyyy");
+//   const element = screen.getByRole('button', {name: /Add/i});
+//   const dueDate = "05/30/2023";
+//   fireEvent.change(inputTask, { target: { value: "History Test"}});
+//   fireEvent.change(inputDate, { target: { value: dueDate}});
+//   fireEvent.click(element);
+//   const check = screen.getByText(/History Test/i);
+//   const checkDate = screen.getByText(new RegExp(dueDate, "i"));
+//   expect(check).toBeInTheDocument();
+//   expect(checkDate).toBeInTheDocument();
+//  });
 
  test('test that App component doesn\'t render dupicate Task', () => {
   render(<App />);
- });
-
- test('test that App component doesn\'t add a task without task name', () => {
-  render(<App />);
+  const inputTask = screen.getByRole('textbox', {name: /Add New Item/i});
+  const inputDate = screen.getByPlaceholderText("mm/dd/yyyy");
+  const element = screen.getByRole('button', {name: /Add/i});
+  fireEvent.change(inputTask, { target: { value: "History Test"}});
+  const dueDate = "05/30/2023";
+  fireEvent.change(inputDate, { target: { value: dueDate}});
+  fireEvent.click(element);
+  fireEvent.change(inputTask, { target: { value: "History Test"}});
+  fireEvent.change(inputDate, { target: { value: dueDate}});
+  fireEvent.click(element);
+  //check that there is only one task
+  const check = screen.getAllByText(/History Test/i);
+  expect(check.length).toBe(1);
  });
 
  test('test that App component doesn\'t add a task without due date', () => {
   render(<App />);
+  const inputTask = screen.getByRole('textbox', {name: /Add New Item/i});
+  const element = screen.getByRole('button', {name: /Add/i});
+  fireEvent.change(inputTask, { target: { value: "History Test"}});
+  fireEvent.click(element);
+  //expect the screen to be empty
+  expect(screen.queryByText(/History Test/i)).toBeNull();
+ });
+
+ test('test that App component doesn\'t add a task without task name', () => {
+  render(<App />);
+  const inputDate = screen.getByPlaceholderText("mm/dd/yyyy");
+  const element = screen.getByRole('button', {name: /Add/i});
+  const dueDate = "05/30/2023";
+  fireEvent.change(inputDate, { target: { value: dueDate}});
+  fireEvent.click(element);
+  //expect the screen to be empty
+  expect(screen.queryByText("05/30/2023")).toBeNull();
  });
 
 
 
  test('test that App component can be deleted thru checkbox', () => {
   render(<App />);
+  const inputTask = screen.getByRole('textbox', {name: /Add New Item/i});
+  const inputDate = screen.getByPlaceholderText("mm/dd/yyyy");
+  const element = screen.getByRole('button', {name: /Add/i});
+  fireEvent.change(inputTask, { target: { value: "History Test"}});
+  const dueDate = "05/30/2023";
+  fireEvent.change(inputDate, { target: { value: dueDate}});
+  fireEvent.click(element);
+
+  const check = screen.getAllByText(/History Test/i);
+  expect(check.length).toBe(1);
+
+  const checkbox = screen.getByRole('checkbox');
+  fireEvent.click(checkbox);
+  expect(screen.queryByText(/History Test/i)).toBeNull();
+
  });
 
 
  test('test that App component renders different colors for past due events', () => {
   render(<App />);
+  const inputTask = screen.getByRole('textbox', {name: /Add New Item/i});
+  const inputDate = screen.getByPlaceholderText("mm/dd/yyyy");
+  const element = screen.getByRole('button', {name: /Add/i});
+
+  fireEvent.change(inputTask, { target: { value: "History Test"}});
+  const dueDate = "05/30/2023";
+  fireEvent.change(inputDate, { target: { value: dueDate}});
+  fireEvent.click(element);
+
+  fireEvent.change(inputTask, { target: { value: "LATE"}});
+  fireEvent.change(inputDate, { target: { value: "05/30/2020"}});
+  fireEvent.click(element);
+
+  const late = screen.getByText(/LATE/i);
+  const early = screen.getByText(/History Test/i);
+
+  //expect late and early's background color to be different
+  expect(late.style.background !== early.style.background);
  });
